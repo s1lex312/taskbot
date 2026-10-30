@@ -57,7 +57,9 @@ async def validation_exception_handler(
         content=_error_body(
             code="validation_error",
             message="Request validation failed",
-            details=exc.errors(),
+            # ctx may hold raw exception objects that are not
+            # JSON-serializable, so it is stripped from the response.
+            details=[{k: v for k, v in e.items() if k != "ctx"} for e in exc.errors()],
         ),
     )
 

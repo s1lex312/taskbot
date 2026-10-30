@@ -2,13 +2,20 @@
 
 from datetime import date, datetime
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from api.models.enums import TaskPriority, TaskStatus
 
 # The bot renders descriptions inside Telegram messages (4096-char limit),
 # so the API caps them well below that ceiling.
 MAX_DESCRIPTION_LENGTH = 2000
+
+
+def _not_in_past(value: date | None) -> date | None:
+    """Reject past due dates; today is allowed."""
+    if value is not None and value < date.today():
+        raise ValueError("due_date cannot be in the past")
+    return value
 
 
 class TaskCreate(BaseModel):
@@ -19,6 +26,8 @@ class TaskCreate(BaseModel):
     priority: TaskPriority = TaskPriority.MEDIUM
     due_date: date | None = None
 
+    _check_due_date = field_validator("due_date")(_not_in_past)
+
 
 class TaskUpdate(BaseModel):
     """Payload for a partial task update. Unset fields stay untouched."""
@@ -28,6 +37,8 @@ class TaskUpdate(BaseModel):
     status: TaskStatus | None = None
     priority: TaskPriority | None = None
     due_date: date | None = None
+
+    _check_due_date = field_validator("due_date")(_not_in_past)
 
 
 class TaskRead(BaseModel):
