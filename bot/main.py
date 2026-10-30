@@ -10,6 +10,8 @@ from aiogram.enums import ParseMode
 
 from bot.config import get_settings
 from bot.handlers import common
+from bot.middlewares.auth import AuthMiddleware
+from bot.services.api_client import ApiClient
 
 logger = logging.getLogger(__name__)
 
@@ -36,12 +38,21 @@ async def main() -> None:
         token=settings.bot_token,
         default=DefaultBotProperties(parse_mode=ParseMode.HTML),
     )
+    api_client = ApiClient(settings.api_base_url, settings.service_key)
+
     dp = Dispatcher()
     dp.include_router(common.router)
 
+    auth_middleware = AuthMiddleware(api_client)
+    dp.message.middleware(auth_middleware)
+    dp.callback_query.middleware(auth_middleware)
+
     await bot.delete_webhook(drop_pending_updates=True)
     logger.info("bot started")
-    await dp.start_polling(bot)
+    try:
+        await dp.start_polling(bot)
+    finally:
+        await api_client.close()
 
 
 if __name__ == "__main__":
