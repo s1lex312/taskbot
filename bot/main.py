@@ -9,7 +9,7 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 
 from bot.config import get_settings
-from bot.handlers import common
+from bot.handlers import common, projects
 from bot.middlewares.auth import AuthMiddleware
 from bot.services.api_client import ApiClient
 
@@ -42,6 +42,7 @@ async def main() -> None:
 
     dp = Dispatcher()
     dp.include_router(common.router)
+    dp.include_router(projects.router)
 
     auth_middleware = AuthMiddleware(api_client)
     dp.message.middleware(auth_middleware)
