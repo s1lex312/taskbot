@@ -105,6 +105,32 @@ async def test_task_in_missing_project_404(client: AsyncClient, auth: dict) -> N
     assert resp.status_code == 404
 
 
+async def test_description_length_limit(
+    client: AsyncClient, auth: dict, project: dict
+) -> None:
+    ok = await client.post(
+        f"/api/v1/projects/{project['id']}/tasks",
+        json={"title": "X", "description": "d" * 2000},
+        headers=auth,
+    )
+    assert ok.status_code == 201
+
+    too_long = await client.post(
+        f"/api/v1/projects/{project['id']}/tasks",
+        json={"title": "X", "description": "d" * 2001},
+        headers=auth,
+    )
+    assert too_long.status_code == 422
+
+    task = await _create(client, auth, project["id"], title="Patch me")
+    resp = await client.patch(
+        f"/api/v1/tasks/{task['id']}",
+        json={"description": "d" * 2001},
+        headers=auth,
+    )
+    assert resp.status_code == 422
+
+
 async def test_task_validation(client: AsyncClient, auth: dict, project: dict) -> None:
     resp = await client.post(
         f"/api/v1/projects/{project['id']}/tasks", json={"title": ""}, headers=auth
