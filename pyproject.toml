@@ -58,7 +58,7 @@ ignore = ["S101"]  # asserts are fine in tests
 mccabe = { max-complexity = 12 }
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["S106"]
+"tests/**" = ["S105", "S106"]
 "alembic/versions/**" = ["E501"]
 
 # --------------------------------------------------------------------- pytest

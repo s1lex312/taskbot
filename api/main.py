@@ -53,7 +53,7 @@ async def validation_exception_handler(
 ) -> JSONResponse:
     """Render pydantic validation errors in the unified format."""
     return JSONResponse(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        status_code=422,  # Unprocessable Content (RFC 9110)
         content=_error_body(
             code="validation_error",
             message="Request validation failed",
