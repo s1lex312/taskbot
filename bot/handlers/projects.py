@@ -20,6 +20,9 @@ logger = logging.getLogger(__name__)
 
 router = Router(name="projects")
 
+# Mirrors the API cap so users get a friendly reply instead of a 422.
+MAX_DESCRIPTION_LENGTH = 2000
+
 
 def _project_card(project: dict) -> str:
     """Render a project as an HTML card."""
@@ -73,7 +76,14 @@ async def np_description_skip(message: Message, state: FSMContext, api: UserApi)
 @router.message(NewProjectForm.description)
 async def np_description(message: Message, state: FSMContext, api: UserApi) -> None:
     """Collect the description and finish the FSM."""
-    await _create_project(message, state, api, description=(message.text or "").strip())
+    description = (message.text or "").strip()
+    if len(description) > MAX_DESCRIPTION_LENGTH:
+        await message.answer(
+            f"Описание слишком длинное (максимум {MAX_DESCRIPTION_LENGTH} "
+            "символов). Попробуй короче или /skip."
+        )
+        return
+    await _create_project(message, state, api, description=description)
 
 
 async def _create_project(

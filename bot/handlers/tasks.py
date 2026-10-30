@@ -28,6 +28,9 @@ logger = logging.getLogger(__name__)
 
 router = Router(name="tasks")
 
+# Mirrors the API cap so users get a friendly reply instead of a 422.
+MAX_DESCRIPTION_LENGTH = 2000
+
 
 def _task_card(task: dict) -> str:
     """Render a task as an HTML card."""
@@ -103,7 +106,14 @@ async def nt_description_skip(message: Message, state: FSMContext) -> None:
 @router.message(NewTaskForm.description)
 async def nt_description(message: Message, state: FSMContext) -> None:
     """Collect the description."""
-    await state.update_data(description=(message.text or "").strip() or None)
+    description = (message.text or "").strip()
+    if len(description) > MAX_DESCRIPTION_LENGTH:
+        await message.answer(
+            f"Описание слишком длинное (максимум {MAX_DESCRIPTION_LENGTH} "
+            "символов). Попробуй короче или /skip."
+        )
+        return
+    await state.update_data(description=description or None)
     await _ask_priority(message, state)
 
 

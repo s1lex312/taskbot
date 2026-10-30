@@ -3,6 +3,8 @@
 from aiogram.types import InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
+from bot.keyboards import truncate
+
 STATUS_EMOJI = {"todo": "⬜", "in_progress": "🔵", "done": "✅"}
 STATUS_LABEL = {"todo": "К выполнению", "in_progress": "В работе", "done": "Выполнена"}
 PRIORITY_EMOJI = {"low": "🟢", "medium": "🟡", "high": "🔴"}
@@ -15,7 +17,9 @@ def projects_select_keyboard(projects: list[dict]) -> InlineKeyboardMarkup:
     """Project picker for the /new_task flow."""
     builder = InlineKeyboardBuilder()
     for project in projects:
-        builder.button(text=f"📁 {project['name']}", callback_data=f"nt:prj:{project['id']}")
+        builder.button(
+            text=f"📁 {truncate(project['name'])}", callback_data=f"nt:prj:{project['id']}"
+        )
     builder.adjust(1)
     return builder.as_markup()
 
@@ -38,7 +42,7 @@ def tasks_keyboard(
     """Task buttons plus pagination controls."""
     builder = InlineKeyboardBuilder()
     for task in tasks:
-        title = task["title"][:40]
+        title = truncate(task["title"])
         builder.button(
             text=f"{STATUS_EMOJI[task['status']]} {title}",
             callback_data=f"task:view:{task['id']}:{project_id}:{page}",

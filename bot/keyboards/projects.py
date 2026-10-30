@@ -3,13 +3,15 @@
 from aiogram.types import InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
+from bot.keyboards import truncate
+
 
 def projects_keyboard(projects: list[dict]) -> InlineKeyboardMarkup:
     """One button per project, opening its card."""
     builder = InlineKeyboardBuilder()
     for project in projects:
         builder.button(
-            text=f"📁 {project['name']}",
+            text=f"📁 {truncate(project['name'])}",
             callback_data=f"prj:view:{project['id']}",
         )
     builder.adjust(1)
