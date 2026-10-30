@@ -5,14 +5,14 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from typing import Any
 
-from fastapi import FastAPI, Request, status
+from fastapi import APIRouter, FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from api.core.config import get_settings
 from api.core.logging import setup_logging
-from api.routers import health
+from api.routers import auth, health, users
 
 logger = logging.getLogger(__name__)
 
@@ -72,7 +72,11 @@ async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONR
     )
 
 
-# Unversioned probe for docker/infra checks; the same router is also
-# mounted under /api/v1 for API consumers.
+# Unversioned probe for docker/infra checks.
 app.include_router(health.router)
-app.include_router(health.router, prefix="/api/v1")
+
+api_v1 = APIRouter(prefix="/api/v1")
+api_v1.include_router(health.router)
+api_v1.include_router(auth.router)
+api_v1.include_router(users.router)
+app.include_router(api_v1)
