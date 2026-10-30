@@ -15,8 +15,7 @@ ENV PYTHONUNBUFFERED=1 \
 RUN groupadd --system app && useradd --system --gid app --no-create-home app
 WORKDIR /app
 COPY --from=builder /install /usr/local
-COPY alembic.ini ./
-COPY alembic ./alembic
+# NOTE: alembic.ini + alembic/ are copied here starting from the db-migrations step.
 COPY api ./api
 USER app
 EXPOSE 8000
