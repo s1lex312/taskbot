@@ -123,6 +123,32 @@ pre-commit install
 
 CI (GitHub Actions) гоняет ruff, black --check и pytest на каждый push.
 
+## Known limitations
+
+- Пагинация задач клиентская — бот забирает весь список, при сотнях задач будет тормозить.
+- `/today` фильтрует по дате на стороне бота, а не в SQL.
+- FSM хранится in-memory — рестарт бота роняет незавершённые диалоги создания.
+- `POST /auth/telegram` без rate-limit (для пет-проекта ок, для прода — нет).
+- Только access-токен на 7 дней, refresh-механики нет.
+
+## Troubleshooting
+
+- **`port 5432 already in use`** — локальный PostgreSQL занял порт: останови его или поменяй маппинг в `docker-compose.yml`.
+- **Бот молчит** — проверь `BOT_TOKEN` в `.env`, смотри `docker compose logs bot`, пересобери: `docker compose up -d --build bot`.
+- **Сборка падает с `TLS handshake timeout` к auth.docker.io** — транзиентная сетевая ошибка Docker Hub, просто повтори `docker compose up --build -d`.
+- **`alembic` не находит ревизию после экспериментов с БД** — `docker compose down -v` (только dev, сносит данные!) и `docker compose up --build -d` заново.
+- **`make: command not found` на Windows** — `scoop install make`, либо выполняй команды из Makefile напрямую.
+
+## Что дальше
+
+Не сделано, но хочется:
+
+- Напоминания по `due_date` через APScheduler.
+- Redis: FSM-хранилище бота + кэш JWT.
+- Фронт внутри Telegram WebApp.
+- Rate-limit на `/auth/telegram`.
+- Деплой на VPS: Docker + Caddy.
+
 ## Лицензия
 
 [MIT](LICENSE)
