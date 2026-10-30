@@ -139,16 +139,6 @@ CI (GitHub Actions) гоняет ruff, black --check и pytest на каждый
 - **`alembic` не находит ревизию после экспериментов с БД** — `docker compose down -v` (только dev, сносит данные!) и `docker compose up --build -d` заново.
 - **`make: command not found` на Windows** — `scoop install make`, либо выполняй команды из Makefile напрямую.
 
-## Что дальше
-
-Не сделано, но хочется:
-
-- Напоминания по `due_date` через APScheduler.
-- Redis: FSM-хранилище бота + кэш JWT.
-- Фронт внутри Telegram WebApp.
-- Rate-limit на `/auth/telegram`.
-- Деплой на VPS: Docker + Caddy.
-
 ## Лицензия
 
 [MIT](LICENSE)
