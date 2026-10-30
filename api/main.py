@@ -12,7 +12,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from api.core.config import get_settings
 from api.core.logging import setup_logging
-from api.routers import auth, health, users
+from api.routers import auth, health, projects, users
 
 logger = logging.getLogger(__name__)
 
@@ -79,4 +79,5 @@ api_v1 = APIRouter(prefix="/api/v1")
 api_v1.include_router(health.router)
 api_v1.include_router(auth.router)
 api_v1.include_router(users.router)
+api_v1.include_router(projects.router)
 app.include_router(api_v1)
