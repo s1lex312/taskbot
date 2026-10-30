@@ -23,7 +23,6 @@ class ProjectRepository:
         return await self._session.scalar(stmt)
 
     async def create(self, owner_id: int, name: str, description: str | None) -> Project:
-        """Insert a project and return it."""
         project = Project(owner_id=owner_id, name=name, description=description)
         self._session.add(project)
         await self._session.commit()
@@ -31,7 +30,6 @@ class ProjectRepository:
         return project
 
     async def update(self, project: Project, fields: dict) -> Project:
-        """Apply a partial update to a project."""
         for key, value in fields.items():
             setattr(project, key, value)
         await self._session.commit()

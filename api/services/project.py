@@ -14,11 +14,9 @@ class ProjectService:
         self._repo = ProjectRepository(session)
 
     async def list_projects(self, owner_id: int) -> list[Project]:
-        """List all projects owned by the user."""
         return await self._repo.list_by_owner(owner_id)
 
     async def create_project(self, owner_id: int, data: ProjectCreate) -> Project:
-        """Create a project for the owner."""
         return await self._repo.create(owner_id, data.name, data.description)
 
     async def get_project(self, project_id: int, owner_id: int) -> Project | None:

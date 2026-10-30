@@ -51,7 +51,6 @@ class TaskRepository:
         priority: TaskPriority,
         due_date: date | None,
     ) -> Task:
-        """Insert a task and return it."""
         task = Task(
             project_id=project_id,
             title=title,
@@ -65,7 +64,6 @@ class TaskRepository:
         return task
 
     async def update(self, task: Task, fields: dict) -> Task:
-        """Apply a partial update to a task."""
         for key, value in fields.items():
             setattr(task, key, value)
         await self._session.commit()
@@ -73,6 +71,5 @@ class TaskRepository:
         return task
 
     async def delete(self, task: Task) -> None:
-        """Delete a task."""
         await self._session.execute(delete(Task).where(Task.id == task.id))
         await self._session.commit()

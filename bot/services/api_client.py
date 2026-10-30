@@ -95,26 +95,21 @@ class UserApi:
 
     # ------------------------------------------------------------------ users
     async def get_me(self) -> dict:
-        """Return the current API user."""
         return await self._request("GET", "/users/me")
 
     # --------------------------------------------------------------- projects
     async def list_projects(self) -> list[dict]:
-        """List projects of the current user."""
         return await self._request("GET", "/projects")
 
     async def create_project(self, name: str, description: str | None = None) -> dict:
-        """Create a project."""
         return await self._request(
             "POST", "/projects", json={"name": name, "description": description}
         )
 
     async def get_project(self, project_id: int) -> dict:
-        """Fetch one project."""
         return await self._request("GET", f"/projects/{project_id}")
 
     async def delete_project(self, project_id: int) -> None:
-        """Delete a project with its tasks."""
         await self._request("DELETE", f"/projects/{project_id}")
 
     # ------------------------------------------------------------------ tasks
@@ -140,7 +135,6 @@ class UserApi:
         priority: str = "medium",
         due_date: str | None = None,
     ) -> dict:
-        """Create a task in a project."""
         return await self._request(
             "POST",
             f"/projects/{project_id}/tasks",
@@ -153,7 +147,6 @@ class UserApi:
         )
 
     async def get_task(self, task_id: int) -> dict:
-        """Fetch one task."""
         return await self._request("GET", f"/tasks/{task_id}")
 
     async def update_task(self, task_id: int, **fields: Any) -> dict:
@@ -161,5 +154,4 @@ class UserApi:
         return await self._request("PATCH", f"/tasks/{task_id}", json=fields)
 
     async def delete_task(self, task_id: int) -> None:
-        """Delete a task."""
         await self._request("DELETE", f"/tasks/{task_id}")
