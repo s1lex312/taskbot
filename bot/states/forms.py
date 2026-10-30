@@ -8,3 +8,13 @@ class NewProjectForm(StatesGroup):
 
     name = State()
     description = State()
+
+
+class NewTaskForm(StatesGroup):
+    """Steps of the /new_task flow."""
+
+    project = State()
+    title = State()
+    description = State()
+    priority = State()
+    due_date = State()

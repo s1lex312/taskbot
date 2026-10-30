@@ -2,7 +2,7 @@
 
 import html
 
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import Message
 
 from bot.services.api_client import ApiError
 
