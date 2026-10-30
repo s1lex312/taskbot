@@ -3,18 +3,15 @@
 from datetime import date
 
 from sqlalchemy import delete, select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.models.enums import TaskPriority, TaskStatus
 from api.models.project import Project
 from api.models.task import Task
+from api.repositories.base import BaseRepository
 
 
-class TaskRepository:
+class TaskRepository(BaseRepository[Task]):
     """CRUD gateway for the tasks table with owner isolation."""
-
-    def __init__(self, session: AsyncSession) -> None:
-        self._session = session
 
     async def list_by_project(
         self,
@@ -51,24 +48,18 @@ class TaskRepository:
         priority: TaskPriority,
         due_date: date | None,
     ) -> Task:
-        task = Task(
-            project_id=project_id,
-            title=title,
-            description=description,
-            priority=priority,
-            due_date=due_date,
+        return await self._save(
+            Task(
+                project_id=project_id,
+                title=title,
+                description=description,
+                priority=priority,
+                due_date=due_date,
+            )
         )
-        self._session.add(task)
-        await self._session.commit()
-        await self._session.refresh(task)
-        return task
 
     async def update(self, task: Task, fields: dict) -> Task:
-        for key, value in fields.items():
-            setattr(task, key, value)
-        await self._session.commit()
-        await self._session.refresh(task)
-        return task
+        return await self._apply(task, fields)
 
     async def delete(self, task: Task) -> None:
         await self._session.execute(delete(Task).where(Task.id == task.id))

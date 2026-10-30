@@ -1,16 +1,13 @@
 """Project persistence operations. All queries are owner-scoped."""
 
 from sqlalchemy import delete, select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.models.project import Project
+from api.repositories.base import BaseRepository
 
 
-class ProjectRepository:
+class ProjectRepository(BaseRepository[Project]):
     """CRUD gateway for the projects table with built-in owner isolation."""
-
-    def __init__(self, session: AsyncSession) -> None:
-        self._session = session
 
     async def list_by_owner(self, owner_id: int) -> list[Project]:
         """Return all projects of an owner, oldest first."""
@@ -23,18 +20,10 @@ class ProjectRepository:
         return await self._session.scalar(stmt)
 
     async def create(self, owner_id: int, name: str, description: str | None) -> Project:
-        project = Project(owner_id=owner_id, name=name, description=description)
-        self._session.add(project)
-        await self._session.commit()
-        await self._session.refresh(project)
-        return project
+        return await self._save(Project(owner_id=owner_id, name=name, description=description))
 
     async def update(self, project: Project, fields: dict) -> Project:
-        for key, value in fields.items():
-            setattr(project, key, value)
-        await self._session.commit()
-        await self._session.refresh(project)
-        return project
+        return await self._apply(project, fields)
 
     async def delete(self, project: Project) -> None:
         """Delete a project and its tasks (cascade)."""
